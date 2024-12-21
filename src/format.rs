@@ -1,5 +1,6 @@
 use crate::parse::Seasonal;
 
+// FIXME: refactor
 pub fn format_seasonal(format_string: &str, season: &Seasonal) -> String {
     let v = format_string;
     let v = &v.replace("{w}", &season.wins.to_string());

@@ -1,9 +1,11 @@
 use config::Config;
+use files::write_to_file;
 use format::format_seasonal;
 use parse::APIResult;
 use ureq::Response;
 
 mod config;
+mod files;
 mod format;
 mod parse;
 
@@ -30,10 +32,12 @@ fn main() {
                 .iter()
                 .last()
                 .expect("player has not played this season");
-            println!(
-                "{}",
-                format_seasonal(&config.display.template, current_season)
-            );
+
+            let format_string = format_seasonal(&config.display.template, current_season);
+
+            if let Err(e) = write_to_file(&config.display.file_path, format_string) {
+                panic!("Error in writing to file: {e}");
+            }
         }
         Err(e) => {
             panic!("Error in api response: {e}");
