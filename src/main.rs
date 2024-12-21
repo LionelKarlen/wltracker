@@ -1,8 +1,10 @@
 use config::Config;
+use format::format_seasonal;
 use parse::APIResult;
 use ureq::Response;
 
 mod config;
+mod format;
 mod parse;
 
 fn main() {
@@ -29,9 +31,8 @@ fn main() {
                 .last()
                 .expect("player has not played this season");
             println!(
-                "{}/{}",
-                current_season.wins,
-                current_season.games - current_season.wins
+                "{}",
+                format_seasonal(&config.display.template, current_season)
             );
         }
         Err(e) => {
