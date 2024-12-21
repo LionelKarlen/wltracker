@@ -3,7 +3,7 @@ use std::{thread, time::Duration};
 use config::Config;
 use files::write_to_file;
 use format::format_seasonal;
-use parse::APIResult;
+use parse::LiteralBody;
 use ureq::Response;
 
 mod config;
@@ -30,17 +30,12 @@ fn main() {
         match res {
             Ok(r) => {
                 // FIXME: don't panic on errors, just keep old value
-                let res =
-                    APIResult::from_raw_string(&r.into_string().expect("failed to parse string"));
-                // FIXME: don't panic on errors, just keep old value
-                let current_season = res
-                    .data
-                    .seasonal
-                    .iter()
-                    .last()
-                    .expect("player has not played this season");
+                let raw_string = &r
+                    .into_string()
+                    .expect("failed to parse API response to string");
+                let data = LiteralBody::new(raw_string);
 
-                let format_string = format_seasonal(&config.display.template, current_season);
+                let format_string = format_seasonal(&config.display.template, &data);
 
                 if let Err(e) = write_to_file(&config.display.file_path, format_string) {
                     // FIXME: don't panic on errors, just keep old value
