@@ -1,3 +1,4 @@
+use core::panic;
 use std::fs::read_to_string;
 
 use serde::Deserialize;
@@ -7,7 +8,7 @@ pub struct Config {
     pub user: User,
     pub auth: Auth,
     pub display: Display,
-    pub internal: Option<Internal>,
+    pub internal: Internal,
 }
 
 #[derive(Deserialize)]
@@ -31,7 +32,7 @@ pub struct Display {
 
 #[derive(Deserialize)]
 pub struct Internal {
-    pub interval: Option<u32>,
+    pub interval: Option<u64>,
 }
 
 impl Config {
@@ -40,6 +41,13 @@ impl Config {
         return Config::from_string(&s);
     }
     pub fn from_string(raw_string: &str) -> Self {
-        return toml::from_str(raw_string).expect("failed to parse config string");
+        let value: Result<Self, toml::de::Error> = toml::from_str(raw_string);
+        match value {
+            Ok(c) => c,
+            Err(e) => {
+                // FIXME: Replace with graceful shutdown
+                panic!("[CONFIG] failed to parse config string: {}", e.message());
+            }
+        }
     }
 }

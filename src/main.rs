@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 use config::Config;
 use files::write_to_file;
 use format::format_seasonal;
@@ -19,29 +21,40 @@ fn main() {
         config.user.username,
         config.user.tag
     );
-    let res = make_request(&url, &config.auth.key);
 
-    // FIXME: don't panic on errors, just keep old value
+    loop {
+        let res = make_request(&url, &config.auth.key);
 
-    match res {
-        Ok(r) => {
-            let res = APIResult::from_raw_string(&r.into_string().expect("failed to parse string"));
-            let current_season = res
-                .data
-                .seasonal
-                .iter()
-                .last()
-                .expect("player has not played this season");
+        // FIXME: don't panic on errors, just keep old value
 
-            let format_string = format_seasonal(&config.display.template, current_season);
+        match res {
+            Ok(r) => {
+                // FIXME: don't panic on errors, just keep old value
+                let res =
+                    APIResult::from_raw_string(&r.into_string().expect("failed to parse string"));
+                // FIXME: don't panic on errors, just keep old value
+                let current_season = res
+                    .data
+                    .seasonal
+                    .iter()
+                    .last()
+                    .expect("player has not played this season");
 
-            if let Err(e) = write_to_file(&config.display.file_path, format_string) {
-                panic!("Error in writing to file: {e}");
+                let format_string = format_seasonal(&config.display.template, current_season);
+
+                if let Err(e) = write_to_file(&config.display.file_path, format_string) {
+                    // FIXME: don't panic on errors, just keep old value
+                    panic!("Error in writing to file: {e}");
+                }
+            }
+            Err(e) => {
+                // FIXME: don't panic on errors, just keep old value
+                // especially include potential fixes according to the status code
+                panic!("Error in api response: {e}");
             }
         }
-        Err(e) => {
-            panic!("Error in api response: {e}");
-        }
+        let interval = &config.internal.interval.unwrap_or(120);
+        thread::sleep(Duration::from_secs(*interval));
     }
 }
 

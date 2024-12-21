@@ -27,6 +27,7 @@ pub struct Season {
 
 impl APIResult {
     pub fn from_raw_string(raw_string: &str) -> Self {
+        // FIXME: don't panic on errors, just keep old value
         return serde_json::from_str(raw_string).expect("failed to serialise to APIResult");
     }
 }
