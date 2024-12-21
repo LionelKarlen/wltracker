@@ -1,5 +1,8 @@
 use dotenv::dotenv;
+use parse::APIResult;
 use ureq::Response;
+
+mod parse;
 
 fn main() {
     dotenv().ok();
@@ -12,9 +15,23 @@ fn main() {
         region, username, tag
     );
     let res = make_request(&url, &token);
+
+    // FIXME: don't panic on errors, just keep old value
+
     match res {
         Ok(r) => {
-            println!("{}", r.into_string().expect("failed to parse"));
+            let res = APIResult::from_raw_string(&r.into_string().expect("failed to parse string"));
+            let current_season = res
+                .data
+                .seasonal
+                .iter()
+                .last()
+                .expect("player has not played this season");
+            println!(
+                "{}/{}",
+                current_season.wins,
+                current_season.games - current_season.wins
+            );
         }
         Err(e) => {
             panic!("we goofed {e}");
