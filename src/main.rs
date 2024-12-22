@@ -1,4 +1,4 @@
-use std::{thread, time::Duration};
+use std::{env::args, thread, time::Duration};
 
 use config::Config;
 use files::write_to_file;
@@ -12,7 +12,12 @@ mod format;
 mod parse;
 
 fn main() {
-    let config = Config::from_file("./config.toml");
+    let mut config_path = "./config.toml";
+    let args: Vec<String> = args().collect();
+    if let Some(s) = args.get(1) {
+        config_path = s;
+    }
+    let config = Config::from_file(config_path);
 
     let url = format!(
         "https://api.henrikdev.xyz/valorant/v3/mmr/{}/{}/{}/{}",

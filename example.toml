@@ -8,7 +8,7 @@ platform="pc" # of of ["pc", "console"]; optional, defaults to "pc"
 key="" # api key; see https://docs.henrikdev.xyz/authentication-and-authorization on how to get your own
 
 [display]
-template="w/l - {w}/{l}" # template string; accepted literals are ["{w}", "{l}", "{season.short}"]
+template="w/l - {w}/{l}" # template string; accepted literals are ["{w}", "{l}", "{season}", "{change}", "{rr}", "{rank}"]
 file_path="" # file output path; -> This is the file you put as your obs source
 
 [internal]
