@@ -45,23 +45,34 @@ struct Season {
 }
 
 impl APIResult {
-    fn from_raw_string(raw_string: &str) -> Self {
-        // FIXME: don't panic on errors, just keep old value
-        return serde_json::from_str(raw_string).expect("failed to serialise to APIResult");
+    fn from_raw_string(raw_string: &str) -> Result<Self, String> {
+        let res = serde_json::from_str(raw_string);
+        match res {
+            Ok(v) => {
+                return Ok(v);
+            }
+            Err(e) => {
+                return Err(format!("[API] Failed to parse json string: {e}"));
+            }
+        }
     }
 }
 
 impl LiteralBody {
-    pub fn new(raw_string: &str) -> Self {
-        let res = APIResult::from_raw_string(raw_string).data;
-        let season = res.seasonal.iter().last().unwrap();
-        return LiteralBody {
+    pub fn new(raw_string: &str) -> Result<Self, String> {
+        let res = APIResult::from_raw_string(raw_string)?.data;
+        let season = res
+            .seasonal
+            .iter()
+            .last()
+            .expect("[API] Failed to find latest season. Have you played yet?");
+        return Ok(LiteralBody {
             w: season.wins,
             l: season.games - season.wins,
             change: res.current.last_change,
             season: season.season.short.clone(),
             rr: res.current.rr,
             rank: res.current.tier.name,
-        };
+        });
     }
 }

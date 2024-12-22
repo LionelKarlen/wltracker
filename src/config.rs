@@ -1,5 +1,5 @@
 use core::panic;
-use std::fs::read_to_string;
+use std::{fs::read_to_string, process};
 
 use serde::Deserialize;
 
@@ -45,8 +45,10 @@ impl Config {
         match value {
             Ok(c) => c,
             Err(e) => {
-                // FIXME: Replace with graceful shutdown
-                panic!("[CONFIG] failed to parse config string: {}", e.message());
+                println!("[PANIC] Unrecoverable error, exiting. See the error message below for more information.");
+                println!("[CONFIG] failed to parse config string: {}", e.message());
+                println!("[HELP] Please take a look at the documentation for the config file, or open an issue on github.");
+                process::exit(1)
             }
         }
     }
