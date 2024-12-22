@@ -2,7 +2,7 @@ use std::{env::args, thread, time::Duration};
 
 use config::Config;
 use files::write_to_file;
-use format::format_seasonal;
+use format::format_literals;
 use parse::LiteralBody;
 use ureq::Response;
 
@@ -48,7 +48,7 @@ fn tick(config: &Config, url: &str) -> Result<(), String> {
             }
             let data = LiteralBody::new(&raw_string.unwrap())?;
 
-            let format_string = format_seasonal(&config.display.template, &data);
+            let format_string = format_literals(&config.display.template, &data);
 
             if let Err(e) = write_to_file(&config.display.file_path, format_string) {
                 return Err(format!("[FILE] Error in writing to file: {e}",));

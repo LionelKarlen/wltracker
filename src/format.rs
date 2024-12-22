@@ -1,7 +1,7 @@
 use crate::parse::LiteralBody;
 
 // FIXME: refactor
-pub fn format_seasonal(format_string: &str, literal_data: &LiteralBody) -> String {
+pub fn format_literals(format_string: &str, literal_data: &LiteralBody) -> String {
     let v = format_string;
     let v = &v.replace("{w}", &literal_data.w.to_string());
     let v = &v.replace("{l}", &literal_data.l.to_string());
