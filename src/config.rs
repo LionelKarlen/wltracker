@@ -32,6 +32,7 @@ pub struct Display {
 #[derive(Deserialize)]
 pub struct Internal {
     pub interval: Option<u64>,
+    pub session: Option<bool>,
 }
 
 impl Config {

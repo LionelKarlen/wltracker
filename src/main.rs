@@ -27,8 +27,15 @@ fn main() {
         config.user.tag
     );
 
+    // run tick with the setup param to initialise the session data
+    if config.internal.session.unwrap_or(false) {
+        if let Err(e) = tick(&config, &url, Some(true)) {
+            eprint!("[SETUP] Failed to setup session data: {e}");
+        }
+    }
+
     loop {
-        if let Err(e) = tick(&config, &url) {
+        if let Err(e) = tick(&config, &url, None) {
             eprintln!("[TICK] Failed to update value: {e}");
         }
         let interval = &config.internal.interval.unwrap_or(120);
@@ -36,7 +43,7 @@ fn main() {
     }
 }
 
-fn tick(config: &Config, url: &str) -> Result<(), String> {
+fn tick(config: &Config, url: &str, setup: Option<bool>) -> Result<(), String> {
     let res = make_request(&url, &config.auth.key);
 
     match res {
@@ -46,7 +53,7 @@ fn tick(config: &Config, url: &str) -> Result<(), String> {
                 Err(e) => return Err(format!("[API] Failed to parse api response to string: {e}")),
                 _ => (),
             }
-            let data = LiteralBody::new(&raw_string.unwrap())?;
+            let data = LiteralBody::new(&raw_string.unwrap(), &config, setup)?;
 
             let format_string = format_literals(&config.display.template, &data);
 
