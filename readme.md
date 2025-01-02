@@ -26,6 +26,7 @@ file_path="" # file output path; -> This is the file you put as your obs source
 
 [internal]
 interval=120 # value in seconds to wait between api calls (keep this reasonable, even though the basic api key supports 30req/min); optional, defaults to 120 seconds
+session=false # whether to use session w/l data over act data; optional, defaults to false``
 ```
 
 ### Template literals
