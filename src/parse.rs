@@ -35,9 +35,12 @@ struct Tier {
 #[derive(Deserialize)]
 struct Seasonal {
     season: Season,
-    wins: u32,
     games: u32,
+    act_wins: Vec<ActWin>,
 }
+
+#[derive(Deserialize)]
+struct ActWin {}
 
 #[derive(Deserialize)]
 struct Season {
@@ -66,9 +69,10 @@ impl LiteralBody {
             .iter()
             .last()
             .expect("[API] Failed to find latest season. Have you played yet?");
+        let real_wins = season.act_wins.len() as u32;
         return Ok(LiteralBody {
-            w: season.wins,
-            l: season.games - season.wins,
+            w: real_wins,
+            l: season.games - real_wins,
             change: res.current.last_change,
             season: season.season.short.clone(),
             rr: res.current.rr,
